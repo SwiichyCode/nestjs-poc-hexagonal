@@ -1,3 +1,4 @@
+// src/infrastructure/repositories/user.repository.impl.ts
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';

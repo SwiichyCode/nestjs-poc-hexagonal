@@ -2,16 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { RegisterUserUseCase } from '../../application/use-cases/register-user.usecase';
 import { AuthenticateUserUseCase } from '../../application/use-cases/authenticate-user.usecase';
-import { UserService } from '../../domain/services/user.service';
 import { JwtService } from '@nestjs/jwt';
 
-const mockUserService = {
-  registerUser: jest.fn(),
-  findUserByUsername: jest.fn(),
+const mockJwtService = {
+  sign: jest.fn(),
 };
 
-const mockJwtService = {
-  sign: jest.fn().mockReturnValue('mockToken'),
+const mockRegisterUserUseCase = {
+  execute: jest.fn(),
+};
+
+const mockAuthenticateUserUseCase = {
+  execute: jest.fn(),
 };
 
 describe('AuthController', () => {
@@ -23,19 +25,11 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        {
-          provide: RegisterUserUseCase,
-          useFactory: (userService: UserService) =>
-            new RegisterUserUseCase(userService),
-          inject: [UserService],
-        },
+        { provide: RegisterUserUseCase, useValue: mockRegisterUserUseCase },
         {
           provide: AuthenticateUserUseCase,
-          useFactory: (userService: UserService, jwtService: JwtService) =>
-            new AuthenticateUserUseCase(userService, jwtService),
-          inject: [UserService, JwtService],
+          useValue: mockAuthenticateUserUseCase,
         },
-        { provide: UserService, useValue: mockUserService },
         { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
