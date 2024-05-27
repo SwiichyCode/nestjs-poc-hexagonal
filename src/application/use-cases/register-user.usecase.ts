@@ -12,25 +12,19 @@ export class RegisterUserUseCase {
     private readonly logger: ILogger,
   ) {}
 
-  async execute(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<void> {
-    const hashedPassword = await this.bcryptService.hash(password, 10);
+  async execute(username: string, email: string, password: string): Promise<void> {
     const existingUser = await this.userRepository.findOneByEmail(email);
 
     if (existingUser) {
+      this.logger.log('RegisterUserUseCase', `User with email ${email} already exists`);
       throw new UnauthorizedException('User already exists');
     }
 
+    const hashedPassword = await this.bcryptService.hash(password, 10);
     const user = new User(null, username, email, hashedPassword);
 
-    this.logger.log(
-      'RegisterUserUseCase',
-      `User ${user.email} registered successfully`,
-    );
-
     await this.userRepository.save(user);
+
+    this.logger.log('RegisterUserUseCase', `User ${user.email} registered successfully`);
   }
 }
