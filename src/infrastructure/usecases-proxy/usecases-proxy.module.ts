@@ -6,9 +6,11 @@ import { RegisterUserUseCase } from '../../application/use-cases/register-user.u
 import { AuthenticateUserUseCase } from '../../application/use-cases/authenticate-user.usecase';
 import { JwtTokenService } from '../services/jwt/jwt.service';
 import { JwtModule } from '../services/jwt/jwt.module';
+import { BcryptModule } from '../services/bcrypt/bcrypt.module';
+import { BcryptService } from '../services/bcrypt/bcrypt.service';
 
 @Module({
-  imports: [RepositoriesModule, JwtModule],
+  imports: [RepositoriesModule, JwtModule, BcryptModule],
 })
 export class UsecasesProxyModule {
   static REGISTER_USECASES_PROXY = 'RegisterUseCasesProxy';
@@ -19,20 +21,28 @@ export class UsecasesProxyModule {
       module: UsecasesProxyModule,
       providers: [
         {
-          inject: [UserRepositoryImpl],
+          inject: [UserRepositoryImpl, BcryptService],
           provide: UsecasesProxyModule.REGISTER_USECASES_PROXY,
-          useFactory: (userRepo: UserRepositoryImpl) =>
-            new UseCaseProxy(new RegisterUserUseCase(userRepo)),
+          useFactory: (
+            userRepo: UserRepositoryImpl,
+            bcryptService: BcryptService,
+          ) =>
+            new UseCaseProxy(new RegisterUserUseCase(userRepo, bcryptService)),
         },
         {
-          inject: [UserRepositoryImpl, JwtTokenService],
+          inject: [UserRepositoryImpl, JwtTokenService, BcryptService],
           provide: UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
           useFactory: (
             userRepo: UserRepositoryImpl,
             jwtTokenService: JwtTokenService,
+            bcryptService: BcryptService,
           ) =>
             new UseCaseProxy(
-              new AuthenticateUserUseCase(userRepo, jwtTokenService),
+              new AuthenticateUserUseCase(
+                userRepo,
+                jwtTokenService,
+                bcryptService,
+              ),
             ),
         },
       ],

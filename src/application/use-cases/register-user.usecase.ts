@@ -3,16 +3,20 @@ import { UserRepository } from '../../domain/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { UnauthorizedException } from '@nestjs/common';
+import { IBcryptService } from '../../domain/adapters/bcrypt.interface';
 
 export class RegisterUserUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly bcryptService: IBcryptService,
+  ) {}
 
   async execute(
     username: string,
     email: string,
     password: string,
   ): Promise<void> {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await this.bcryptService.hash(password, 10);
     const existingUser = await this.userRepository.findOneByUsername(username);
 
     if (existingUser) {
