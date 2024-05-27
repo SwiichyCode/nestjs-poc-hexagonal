@@ -2,12 +2,14 @@
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { JwtTokenService } from '../../infrastructure/services/jwt/jwt.service';
 import { IBcryptService } from '../../domain/adapters/bcrypt.interface';
+import { ILogger } from '../../domain/logger/logger.interface';
 
 export class AuthenticateUserUseCase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtTokenService: JwtTokenService,
     private readonly bcryptService: IBcryptService,
+    private readonly logger: ILogger,
   ) {}
 
   async execute(email: string, password: string): Promise<string | null> {
@@ -20,7 +22,15 @@ export class AuthenticateUserUseCase {
         email: user.email,
       };
 
-      return this.jwtTokenService.signAsync(payload);
+      const token = await this.jwtTokenService.signAsync(payload);
+
+      if (token) {
+        this.logger.log(
+          'AuthenticateUserUseCase',
+          `User ${user.email} authenticated successfully`,
+        );
+        return token;
+      }
     }
 
     return null;

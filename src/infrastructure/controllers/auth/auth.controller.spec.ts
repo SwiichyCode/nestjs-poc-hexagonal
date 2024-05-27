@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { RegisterUserUseCase } from '../../application/use-cases/register-user.usecase';
-import { AuthenticateUserUseCase } from '../../application/use-cases/authenticate-user.usecase';
+import { RegisterUserUseCase } from '../../../application/use-cases/register-user.usecase';
+import { AuthenticateUserUseCase } from '../../../application/use-cases/authenticate-user.usecase';
 import { JwtService } from '@nestjs/jwt';
 
 const mockJwtService = {

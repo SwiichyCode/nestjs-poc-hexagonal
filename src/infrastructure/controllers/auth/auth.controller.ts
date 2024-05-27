@@ -5,10 +5,11 @@ import {
   UnauthorizedException,
   Inject,
 } from '@nestjs/common';
-import { RegisterUserUseCase } from '../../application/use-cases/register-user.usecase';
-import { AuthenticateUserUseCase } from '../../application/use-cases/authenticate-user.usecase';
-import { UsecasesProxyModule } from '../usecases-proxy/usecases-proxy.module';
-import { UseCaseProxy } from '../usecases-proxy/usecases-proxy';
+import { RegisterUserUseCase } from '../../../application/use-cases/register-user.usecase';
+import { AuthenticateUserUseCase } from '../../../application/use-cases/authenticate-user.usecase';
+import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
+import { UseCaseProxy } from '../../usecases-proxy/usecases-proxy';
+import { RegisterUserDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,12 +21,12 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(
-    @Body() body: { username: string; email: string; password: string },
-  ) {
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    const { username, email, password } = registerUserDto;
+
     await this.registerUsecaseProxy
       .getInstance()
-      .execute(body.username, body.email, body.password);
+      .execute(username, email, password);
     return { message: 'User registered successfully' };
   }
 
