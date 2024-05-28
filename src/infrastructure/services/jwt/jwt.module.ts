@@ -3,7 +3,7 @@ import { JwtTokenService } from './jwt.service';
 import { JwtModule as Jwt } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: './env/local.env' });
+dotenv.config();
 
 @Module({
   imports: [
