@@ -16,7 +16,7 @@ import { LoggerService } from '../logger/logger.service';
 })
 export class UsecasesProxyModule {
   static REGISTER_USECASES_PROXY = 'RegisterUseCasesProxy';
-  static AUTHENTICATE_USECASES_PROXY = 'LoginUseCasesProxy';
+  static AUTHENTICATE_USECASES_PROXY = 'AuthenticateUseCasesProxy';
 
   static register(): DynamicModule {
     return {
@@ -25,44 +25,22 @@ export class UsecasesProxyModule {
         {
           inject: [UserRepositoryImpl, BcryptService, LoggerService],
           provide: UsecasesProxyModule.REGISTER_USECASES_PROXY,
-          useFactory: (
-            userRepo: UserRepositoryImpl,
-            bcryptService: BcryptService,
-            logger: LoggerService,
-          ) =>
-            new UseCaseProxy(
-              new RegisterUserUseCase(userRepo, bcryptService, logger),
-            ),
+          useFactory: (userRepo: UserRepositoryImpl, bcryptService: BcryptService, logger: LoggerService) =>
+            new UseCaseProxy(new RegisterUserUseCase(userRepo, bcryptService, logger)),
         },
         {
-          inject: [
-            UserRepositoryImpl,
-            JwtTokenService,
-            BcryptService,
-            LoggerService,
-          ],
+          inject: [UserRepositoryImpl, JwtTokenService, BcryptService, LoggerService],
           provide: UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
           useFactory: (
             userRepo: UserRepositoryImpl,
             jwtTokenService: JwtTokenService,
             bcryptService: BcryptService,
             logger: LoggerService,
-          ) =>
-            new UseCaseProxy(
-              new AuthenticateUserUseCase(
-                userRepo,
-                jwtTokenService,
-                bcryptService,
-                logger,
-              ),
-            ),
+          ) => new UseCaseProxy(new AuthenticateUserUseCase(userRepo, jwtTokenService, bcryptService, logger)),
         },
       ],
 
-      exports: [
-        UsecasesProxyModule.REGISTER_USECASES_PROXY,
-        UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
-      ],
+      exports: [UsecasesProxyModule.REGISTER_USECASES_PROXY, UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY],
     };
   }
 }

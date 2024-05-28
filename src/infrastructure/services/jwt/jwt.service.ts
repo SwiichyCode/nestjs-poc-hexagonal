@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  IJwtService,
-  IJwtServicePayload,
-} from '../../../domain/adapters/jwt.interface';
+import { IJwtService, IJwtServicePayload } from '../../../domain/adapters/jwt.interface';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -11,5 +8,9 @@ export class JwtTokenService implements IJwtService {
 
   signAsync(payload: IJwtServicePayload) {
     return this.jwtService.signAsync(payload);
+  }
+
+  verifyAsync(token: string) {
+    return this.jwtService.verifyAsync(token);
   }
 }

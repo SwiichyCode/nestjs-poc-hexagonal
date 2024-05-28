@@ -5,6 +5,7 @@ import { UsecasesProxyModule } from './infrastructure/usecases-proxy/usecases-pr
 import { ControllersModule } from './infrastructure/controllers/controllers.module';
 import { MiddlewareModule } from '@nestjs/core/middleware/middleware-module';
 import { LoggerModule } from './infrastructure/logger/logger.module';
+import { EnvironmentConfigModule } from './infrastructure/config/environment-config/environment-config.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { LoggerModule } from './infrastructure/logger/logger.module';
       entities: [User],
       synchronize: true,
     }),
+    EnvironmentConfigModule,
   ],
 })
 export class AppModule {}

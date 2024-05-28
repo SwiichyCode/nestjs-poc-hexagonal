@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtTokenService } from './jwt.service';
 import { JwtModule as Jwt } from '@nestjs/jwt';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: './env/local.env' });
 
 @Module({
   imports: [
     Jwt.register({
-      secret: 'secret',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
   ],
