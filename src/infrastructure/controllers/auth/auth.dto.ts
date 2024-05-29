@@ -33,3 +33,13 @@ export class SendVerificationEmailDto {
   @IsNotEmpty()
   email: string;
 }
+
+export class VerifyEmailCodeDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  code: number;
+}

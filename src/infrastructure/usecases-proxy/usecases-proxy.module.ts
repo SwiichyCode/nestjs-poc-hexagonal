@@ -19,6 +19,7 @@ import { EmailService } from '../services/email/mailer.service';
 import { UserFactory } from '../../application/factory/user.factory';
 import { EmailVerificationRepositoryImpl } from '../repositories/email-verification.impl';
 import { SendVerificationEmailUsecase } from '../../application/use-cases/send-verification-email.usecase';
+import { VerifyEmailCodeUsecase } from '../../application/use-cases/verify-email-code.usecase';
 
 @Module({
   imports: [RepositoriesModule, ApplicationModule, JwtModule, BcryptModule, EmailModule, LoggerModule],
@@ -28,6 +29,7 @@ export class UsecasesProxyModule {
   static AUTHENTICATE_USER_USECASES_PROXY = 'AuthenticateUseCasesProxy';
   static CREATE_COMPANY_USECASES_PROXY = 'CreateCompanyUseCasesProxy';
   static SEND_VERIFICATION_EMAIL_USECASES_PROXY = 'SendVerificationEmailUseCasesProxy';
+  static VERIFY_EMAIL_CODE_USECASES_PROXY = 'VerifyEmailCodeUseCasesProxy';
 
   static register(): DynamicModule {
     return {
@@ -70,6 +72,12 @@ export class UsecasesProxyModule {
             logger: LoggerService,
           ) => new UseCaseProxy(new SendVerificationEmailUsecase(emailVerificationRepo, userRepo, emailService, logger)),
         },
+        {
+          inject: [EmailVerificationRepositoryImpl, LoggerService],
+          provide: UsecasesProxyModule.VERIFY_EMAIL_CODE_USECASES_PROXY,
+          useFactory: (emailVerificationRepo: EmailVerificationRepositoryImpl, logger: LoggerService) =>
+            new UseCaseProxy(new VerifyEmailCodeUsecase(emailVerificationRepo, logger)),
+        },
       ],
 
       exports: [
@@ -77,6 +85,7 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.AUTHENTICATE_USER_USECASES_PROXY,
         UsecasesProxyModule.CREATE_COMPANY_USECASES_PROXY,
         UsecasesProxyModule.SEND_VERIFICATION_EMAIL_USECASES_PROXY,
+        UsecasesProxyModule.VERIFY_EMAIL_CODE_USECASES_PROXY,
       ],
     };
   }

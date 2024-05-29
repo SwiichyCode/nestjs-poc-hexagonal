@@ -31,6 +31,11 @@ export class AuthenticateUserUseCase {
     const payload = { sub: user.id, username: user.username, email: user.email };
     const token = await this.jwtTokenService.signAsync(payload);
 
+    if (!token) {
+      this.logger.error('AuthenticateUserUseCase', `Error generating token for user ${user.email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     this.logger.log('AuthenticateUserUseCase', `User ${user.email} authenticated successfully`);
 
     return token;

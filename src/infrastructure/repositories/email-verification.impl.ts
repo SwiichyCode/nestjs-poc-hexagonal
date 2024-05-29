@@ -19,4 +19,8 @@ export class EmailVerificationRepositoryImpl implements EmailVerificationReposit
     const emailVerification = await this.emailVerificationRepository.findOne({ where: { email, code } });
     return emailVerification || null;
   }
+
+  async delete(emailVerification: EmailVerification): Promise<void> {
+    await this.emailVerificationRepository.remove(emailVerification);
+  }
 }

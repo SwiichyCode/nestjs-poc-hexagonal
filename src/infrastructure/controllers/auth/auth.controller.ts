@@ -3,8 +3,9 @@ import { RegisterUserUseCase } from '../../../application/use-cases/register-use
 import { AuthenticateUserUseCase } from '../../../application/use-cases/authenticate-user.usecase';
 import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
 import { UseCaseProxy } from '../../usecases-proxy/usecases-proxy';
-import { LoginUserDto, RegisterUserDto, SendVerificationEmailDto } from './auth.dto';
+import { LoginUserDto, RegisterUserDto, SendVerificationEmailDto, VerifyEmailCodeDto } from './auth.dto';
 import { SendVerificationEmailUsecase } from '../../../application/use-cases/send-verification-email.usecase';
+import { VerifyEmailCodeUsecase } from '../../../application/use-cases/verify-email-code.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +16,8 @@ export class AuthController {
     private authenticateUsecaseProxy: UseCaseProxy<AuthenticateUserUseCase>,
     @Inject(UsecasesProxyModule.SEND_VERIFICATION_EMAIL_USECASES_PROXY)
     private sendVerificationEmailUsecaseProxy: UseCaseProxy<SendVerificationEmailUsecase>,
+    @Inject(UsecasesProxyModule.VERIFY_EMAIL_CODE_USECASES_PROXY)
+    private verifyEmailCodeUsecase: UseCaseProxy<VerifyEmailCodeUsecase>,
   ) {}
 
   @Post('register')
@@ -25,19 +28,18 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
-    const { email, password } = loginUserDto;
-    const token = await this.authenticateUsecaseProxy.getInstance().execute(email, password);
-
-    if (!token) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return { token };
+    return await this.authenticateUsecaseProxy.getInstance().execute(loginUserDto.email, loginUserDto.password);
   }
 
   @Post('send-verification-email')
   async sendVerificationEmail(@Body() sendVerificationEmailDto: SendVerificationEmailDto) {
     await this.sendVerificationEmailUsecaseProxy.getInstance().execute(sendVerificationEmailDto.email);
     return { message: 'Verification email sent successfully' };
+  }
+
+  @Post('verify-email-code')
+  async verifyEmailCode(@Body() verifyEmailCodeDto: VerifyEmailCodeDto) {
+    await this.verifyEmailCodeUsecase.getInstance().execute(verifyEmailCodeDto.email, verifyEmailCodeDto.code);
+    return { message: 'Email verified successfully' };
   }
 }
