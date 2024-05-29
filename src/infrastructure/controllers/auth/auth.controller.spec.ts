@@ -36,9 +36,7 @@ describe('AuthController', () => {
 
     authController = module.get<AuthController>(AuthController);
     registerUserUseCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
-    authenticateUserUseCase = module.get<AuthenticateUserUseCase>(
-      AuthenticateUserUseCase,
-    );
+    authenticateUserUseCase = module.get<AuthenticateUserUseCase>(AuthenticateUserUseCase);
   });
 
   afterEach(() => {
@@ -50,6 +48,7 @@ describe('AuthController', () => {
       const registerSpy = jest.spyOn(registerUserUseCase, 'execute');
       await authController.register({
         username: 'username',
+        email: 'email',
         password: 'password',
       });
       expect(registerSpy).toHaveBeenCalledWith('username', 'password');
@@ -60,6 +59,7 @@ describe('AuthController', () => {
       expect(
         await authController.register({
           username: 'username',
+          email: 'email',
           password: 'password',
         }),
       ).toEqual({ message: 'User' + ' registered successfully' });
@@ -70,7 +70,7 @@ describe('AuthController', () => {
     it('should call authenticateUserUseCase.execute', async () => {
       const authenticateSpy = jest.spyOn(authenticateUserUseCase, 'execute');
       await authController.login({
-        username: 'username',
+        email: 'email',
         password: 'password',
       });
       expect(authenticateSpy).toHaveBeenCalledWith('username', 'password');
@@ -80,7 +80,7 @@ describe('AuthController', () => {
       jest.spyOn(authenticateUserUseCase, 'execute').mockResolvedValue('token');
       expect(
         await authController.login({
-          username: 'username',
+          email: 'email',
           password: 'password',
         }),
       ).toEqual({ token: 'token' });
@@ -90,7 +90,7 @@ describe('AuthController', () => {
       jest.spyOn(authenticateUserUseCase, 'execute').mockResolvedValue(null);
       expect(
         await authController.login({
-          username: 'username',
+          email: 'email',
           password: 'password',
         }),
       ).toEqual({ message: 'Invalid credentials' });

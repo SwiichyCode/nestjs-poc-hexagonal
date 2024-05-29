@@ -10,27 +10,34 @@ import { BcryptModule } from '../services/bcrypt/bcrypt.module';
 import { BcryptService } from '../services/bcrypt/bcrypt.service';
 import { LoggerModule } from '../logger/logger.module';
 import { LoggerService } from '../logger/logger.service';
+import { CompanyRepositoryImpl } from '../repositories/company.repository.impl';
+import { CompanyFactory } from '../../application/factory/company.factory';
+import { CreateCompanyUsecase } from '../../application/use-cases/create-company.usecase';
+import { ApplicationModule } from '../../application/application.module';
+import { EmailModule } from '../services/email/mailer.module';
+import { EmailService } from '../services/email/mailer.service';
 
 @Module({
-  imports: [RepositoriesModule, JwtModule, BcryptModule, LoggerModule],
+  imports: [RepositoriesModule, ApplicationModule, JwtModule, BcryptModule, EmailModule, LoggerModule],
 })
 export class UsecasesProxyModule {
-  static REGISTER_USECASES_PROXY = 'RegisterUseCasesProxy';
-  static AUTHENTICATE_USECASES_PROXY = 'AuthenticateUseCasesProxy';
+  static REGISTER_USER_USECASES_PROXY = 'RegisterUseCasesProxy';
+  static AUTHENTICATE_USER_USECASES_PROXY = 'AuthenticateUseCasesProxy';
+  static CREATE_COMPANY_USECASES_PROXY = 'CreateCompanyUseCasesProxy';
 
   static register(): DynamicModule {
     return {
       module: UsecasesProxyModule,
       providers: [
         {
-          inject: [UserRepositoryImpl, BcryptService, LoggerService],
-          provide: UsecasesProxyModule.REGISTER_USECASES_PROXY,
-          useFactory: (userRepo: UserRepositoryImpl, bcryptService: BcryptService, logger: LoggerService) =>
-            new UseCaseProxy(new RegisterUserUseCase(userRepo, bcryptService, logger)),
+          inject: [UserRepositoryImpl, BcryptService, EmailService, LoggerService],
+          provide: UsecasesProxyModule.REGISTER_USER_USECASES_PROXY,
+          useFactory: (userRepo: UserRepositoryImpl, bcryptService: BcryptService, emailService: EmailService, logger: LoggerService) =>
+            new UseCaseProxy(new RegisterUserUseCase(userRepo, bcryptService, emailService, logger)),
         },
         {
           inject: [UserRepositoryImpl, JwtTokenService, BcryptService, LoggerService],
-          provide: UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
+          provide: UsecasesProxyModule.AUTHENTICATE_USER_USECASES_PROXY,
           useFactory: (
             userRepo: UserRepositoryImpl,
             jwtTokenService: JwtTokenService,
@@ -38,9 +45,19 @@ export class UsecasesProxyModule {
             logger: LoggerService,
           ) => new UseCaseProxy(new AuthenticateUserUseCase(userRepo, jwtTokenService, bcryptService, logger)),
         },
+        {
+          inject: [CompanyRepositoryImpl, CompanyFactory, LoggerService],
+          provide: UsecasesProxyModule.CREATE_COMPANY_USECASES_PROXY,
+          useFactory: (companyRepo: CompanyRepositoryImpl, companyFactory: CompanyFactory, logger: LoggerService) =>
+            new UseCaseProxy(new CreateCompanyUsecase(companyRepo, companyFactory, logger)),
+        },
       ],
 
-      exports: [UsecasesProxyModule.REGISTER_USECASES_PROXY, UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY],
+      exports: [
+        UsecasesProxyModule.REGISTER_USER_USECASES_PROXY,
+        UsecasesProxyModule.AUTHENTICATE_USER_USECASES_PROXY,
+        UsecasesProxyModule.CREATE_COMPANY_USECASES_PROXY,
+      ],
     };
   }
 }

@@ -8,9 +8,9 @@ import { LoginUserDto, RegisterUserDto } from './auth.dto';
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject(UsecasesProxyModule.REGISTER_USECASES_PROXY)
+    @Inject(UsecasesProxyModule.REGISTER_USER_USECASES_PROXY)
     private registerUsecaseProxy: UseCaseProxy<RegisterUserUseCase>,
-    @Inject(UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY)
+    @Inject(UsecasesProxyModule.AUTHENTICATE_USER_USECASES_PROXY)
     private authenticateUsecaseProxy: UseCaseProxy<AuthenticateUserUseCase>,
   ) {}
 
