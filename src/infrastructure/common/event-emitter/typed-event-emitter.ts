@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EventPayloads } from '../../services/email/mailer.service';
+import { EventPayloads } from '../../../domain/adapters/mailing.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()

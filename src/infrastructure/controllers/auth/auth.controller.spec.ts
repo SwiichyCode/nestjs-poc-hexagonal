@@ -50,6 +50,7 @@ describe('AuthController', () => {
         username: 'username',
         email: 'email',
         password: 'password',
+        companyId: null,
       });
       expect(registerSpy).toHaveBeenCalledWith('username', 'password');
     });
@@ -61,6 +62,7 @@ describe('AuthController', () => {
           username: 'username',
           email: 'email',
           password: 'password',
+          companyId: null,
         }),
       ).toEqual({ message: 'User' + ' registered successfully' });
     });

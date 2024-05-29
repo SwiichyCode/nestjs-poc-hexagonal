@@ -26,7 +26,7 @@ dotenv.config();
         dir: join(__dirname, 'templates'),
         adapter: new EjsAdapter(),
         options: {
-          strict: true,
+          strict: false,
         },
       },
     }),
