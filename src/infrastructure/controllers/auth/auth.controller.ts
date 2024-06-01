@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Inject } from '@nestjs/common';
 import { RegisterUserUseCase } from '../../../application/use-cases/register-user.usecase';
 import { AuthenticateUserUseCase } from '../../../application/use-cases/authenticate-user.usecase';
 import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
@@ -28,7 +28,8 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authenticateUsecaseProxy.getInstance().execute(loginUserDto.email, loginUserDto.password);
+    const token = await this.authenticateUsecaseProxy.getInstance().execute(loginUserDto.email, loginUserDto.password);
+    return { token, message: 'User authenticated successfully' };
   }
 
   @Post('send-verification-email')
