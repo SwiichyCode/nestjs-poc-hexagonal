@@ -4,11 +4,12 @@ import { JwtTokenService } from '../../infrastructure/services/jwt/jwt.service';
 import { IBcryptService } from '../../domain/adapters/bcrypt.interface';
 import { ILogger } from '../../domain/logger/logger.interface';
 import { UnauthorizedException } from '@nestjs/common';
+import { IJwtService } from '../../domain/adapters/jwt.interface';
 
 export class AuthenticateUserUseCase {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly jwtTokenService: JwtTokenService,
+    private readonly jwtTokenService: IJwtService,
     private readonly bcryptService: IBcryptService,
     private readonly logger: ILogger,
   ) {}

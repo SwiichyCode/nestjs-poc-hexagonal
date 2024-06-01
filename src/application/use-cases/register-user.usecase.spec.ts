@@ -4,6 +4,8 @@ import { IBcryptService } from '../../domain/adapters/bcrypt.interface';
 import { IMailingService } from '../../domain/adapters/mailing.interface';
 import { ILogger } from '../../domain/logger/logger.interface';
 import { RegisterUserUseCase } from './register-user.usecase';
+import { UserCommand } from '../commands/user.command';
+import { User } from '../../domain/entities/user.entity';
 
 describe('RegisterUserUsecase', () => {
   let registerUserUsecase: RegisterUserUseCase;
@@ -24,7 +26,7 @@ describe('RegisterUserUsecase', () => {
   });
 
   it('should register a new user', async () => {
-    const userCommand = {
+    const USER_COMMAND_MOCK: UserCommand = {
       username: 'swiichy',
       email: 'adlpromail@gmail.com',
       password: 'password',
@@ -32,36 +34,37 @@ describe('RegisterUserUsecase', () => {
     };
 
     const hashedPassword = 'hashedPassword';
+    const createdUser = { ...USER_COMMAND_MOCK, password: hashedPassword } as User;
 
     userRepository.findOneByEmail = jest.fn().mockResolvedValue(null);
     bcryptService.hash = jest.fn().mockResolvedValue(hashedPassword);
-    userFactory.createUser = jest.fn().mockReturnValue(userCommand);
+    userFactory.createUser = jest.fn().mockReturnValue(createdUser);
     userRepository.save = jest.fn();
     mailingService.handleUserRegisteredEvent = jest.fn();
     logger.log = jest.fn();
 
-    await registerUserUsecase.execute(userCommand);
+    await registerUserUsecase.execute(USER_COMMAND_MOCK);
 
-    expect(userRepository.findOneByEmail).toHaveBeenCalledWith(userCommand.email);
-    expect(bcryptService.hash).toHaveBeenCalledWith(userCommand.password, 10);
-    expect(userFactory.createUser).toHaveBeenCalledWith({ ...userCommand, password: hashedPassword });
-    expect(userRepository.save).toHaveBeenCalledWith(userCommand);
-    expect(mailingService.handleUserRegisteredEvent).toHaveBeenCalledWith({ email: userCommand.email });
-    expect(logger.log).toHaveBeenCalledWith('RegisterUserUseCase', `User ${userCommand.email} registered successfully`);
+    expect(userRepository.findOneByEmail).toHaveBeenCalledWith(USER_COMMAND_MOCK.email);
+    expect(bcryptService.hash).toHaveBeenCalledWith(USER_COMMAND_MOCK.password, 10);
+    expect(userFactory.createUser).toHaveBeenCalledWith({ ...USER_COMMAND_MOCK, password: hashedPassword });
+    expect(userRepository.save).toHaveBeenCalledWith(createdUser);
+    expect(mailingService.handleUserRegisteredEvent).toHaveBeenCalledWith({ email: USER_COMMAND_MOCK.email });
+    expect(logger.log).toHaveBeenCalledWith('RegisterUserUseCase', `User ${USER_COMMAND_MOCK.email} registered successfully`);
   });
 
   it('should throw an error if user already exists', async () => {
-    const userCommand = {
+    const USER_COMMAND_MOCK: UserCommand = {
       username: 'swiichy',
       email: 'adlpromail@gmail.com',
       password: 'password',
       companyId: 0,
     };
 
-    userRepository.findOneByEmail = jest.fn().mockResolvedValue(userCommand);
+    userRepository.findOneByEmail = jest.fn().mockResolvedValue(USER_COMMAND_MOCK);
     logger.log = jest.fn();
 
-    await expect(registerUserUsecase.execute(userCommand)).rejects.toThrow('User already exists');
-    expect(logger.log).toHaveBeenCalledWith('RegisterUserUseCase', `User with email ${userCommand.email} already exists`);
+    await expect(registerUserUsecase.execute(USER_COMMAND_MOCK)).rejects.toThrow('User already exists');
+    expect(logger.log).toHaveBeenCalledWith('RegisterUserUseCase', `User with email ${USER_COMMAND_MOCK.email} already exists`);
   });
 });

@@ -6,4 +6,5 @@ export interface IJwtServicePayload {
 
 export interface IJwtService {
   signAsync(payload: IJwtServicePayload): Promise<string>;
+  verifyAsync(token: string): Promise<IJwtServicePayload>;
 }
